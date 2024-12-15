@@ -1,0 +1,138 @@
+import pygame, random
+
+pygame.init()
+
+WIDTH, HEIGHT = 800, 400
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("เกมวิ่งหลบสิ่งกีดขวาง")
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+
+clock = pygame.time.Clock()
+player = {'x': 50, 'y': HEIGHT - 60, 'width': 50, 'height': 50, 'velocity': 0, 'is_jumping': False}
+obstacles = [{'x': random.randint(400, 800), 'width': random.randint(30, 80)} for _ in range(3)]
+running = True
+score = 0
+
+while running:
+    screen.fill(WHITE)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not player['is_jumping']:
+            player['is_jumping'] = True
+            player['velocity'] = -12
+
+    player['y'] += player['velocity']
+    if player['is_jumping']:
+        player['velocity'] += 1
+    if player['y'] >= HEIGHT - player['height']:
+        player['y'] = HEIGHT - player['height']
+        player['is_jumping'] = False
+
+    for obs in obstacles:
+        obs['x'] -= 5
+        if obs['x'] < -obs['width']:
+            obs['x'] = WIDTH + random.randint(100, 300)
+            obs['width'] = random.randint(30, 80)
+            score += 1
+
+    for obs in obstacles:
+        pygame.draw.rect(screen, BLACK, (obs['x'], HEIGHT - 30, obs['width'], 30))
+        if player['x'] + player['width'] > obs['x'] and player['x'] < obs['x'] + obs['width'] and player['y'] + player['height'] >= HEIGHT - 30:
+            running = False
+
+    pygame.draw.rect(screen, RED, (player['x'], player['y'], player['width'], player['height']))
+
+    score_text = pygame.font.SysFont(None, 36).render(f"Score: {score}", True, (0, 0, 0))
+    screen.blit(score_text, (10, 10))
+
+    pygame.display.update()
+    clock.tick(30)
+
+pygame.quit()
+
+#อธิบายโค้ด===========================================================================================================
+
+import pygame, random  # นำเข้าไลบรารี pygame และ random
+
+pygame.init()  # เริ่มต้น Pygame
+
+# กำหนดขนาดหน้าจอ
+WIDTH, HEIGHT = 800, 400  # ความกว้างและความสูงของหน้าจอ
+screen = pygame.display.set_mode((WIDTH, HEIGHT))  # สร้างหน้าจอ
+pygame.display.set_caption("เกมวิ่งหลบสิ่งกีดขวาง")  # กำหนดชื่อเกม
+
+# สีที่ใช้ในเกม
+WHITE = (255, 255, 255)  # สีพื้นหลัง (สีขาว)
+BLACK = (0, 0, 0)  # สีของสิ่งกีดขวาง (สีดำ)
+RED = (255, 0, 0)  # สีของตัวละคร (สีแดง)
+
+# ตัวจับเวลา
+clock = pygame.time.Clock()  # ตัวจับเวลาเพื่อควบคุมเฟรมเรต
+
+# ตัวละคร (Player)
+player = {
+    'x': 50,  # ตำแหน่ง x ของตัวละคร
+    'y': HEIGHT - 60,  # ตำแหน่ง y (พื้น)
+    'width': 50,  # ความกว้างของตัวละคร
+    'height': 50,  # ความสูงของตัวละคร
+    'velocity': 0,  # ความเร็วในแนวตั้ง (สำหรับกระโดด)
+    'is_jumping': False  # สถานะกระโดด (True = กำลังกระโดด, False = ไม่ได้กระโดด)
+}
+
+# สิ่งกีดขวาง (Obstacle)
+obstacles = [{'x': random.randint(400, 800), 'width': random.randint(30, 80)} for _ in range(3)]  # สร้างสิ่งกีดขวางแบบสุ่ม 3 อัน
+
+# ตัวแปรสถานะของเกม
+running = True  # ตัวแปรควบคุมการทำงานของเกม
+score = 0  # คะแนนเริ่มต้นที่ 0
+
+while running:
+    screen.fill(WHITE)  # ตั้งค่าพื้นหลังสีขาว
+
+    # ตรวจจับเหตุการณ์ (Event)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:  # ถ้าผู้ใช้กดปุ่มปิดหน้าต่าง
+            running = False  # หยุดการทำงานของเกม
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not player['is_jumping']:  # กดปุ่ม SPACE เพื่อกระโดด
+            player['is_jumping'] = True  # ตั้งสถานะเป็นกระโดด
+            player['velocity'] = -12  # กำหนดความเร็วสำหรับการกระโดด (ขึ้นไป)
+
+    # อัปเดตการกระโดดของตัวละคร
+    player['y'] += player['velocity']  # อัปเดตตำแหน่ง y (เคลื่อนขึ้น/ลง)
+    if player['is_jumping']:
+        player['velocity'] += 1  # เลียนแบบแรงโน้มถ่วง (เพิ่มความเร็วลง)
+    if player['y'] >= HEIGHT - player['height']:  # ถ้าตัวละครถึงพื้น
+        player['y'] = HEIGHT - player['height']  # วางตัวละครติดพื้น
+        player['is_jumping'] = False  # ตัวละครหยุดกระโดด
+
+    # อัปเดตตำแหน่งของสิ่งกีดขวาง
+    for obs in obstacles:
+        obs['x'] -= 5  # สิ่งกีดขวางเคลื่อนที่ไปทางซ้าย
+        if obs['x'] < -obs['width']:  # ถ้าสิ่งกีดขวางออกนอกจอ
+            obs['x'] = WIDTH + random.randint(100, 300)  # วางสิ่งกีดขวางใหม่
+            obs['width'] = random.randint(30, 80)  # กำหนดความกว้างของสิ่งกีดขวางแบบสุ่ม
+            score += 1  # เพิ่มคะแนน
+
+    # ตรวจสอบว่าตัวละครชนสิ่งกีดขวางหรือไม่
+    for obs in obstacles:
+        pygame.draw.rect(screen, BLACK, (obs['x'], HEIGHT - 30, obs['width'], 30))  # วาดสิ่งกีดขวาง (สีดำ)
+        # ตรวจสอบการชนระหว่างตัวละครและสิ่งกีดขวาง
+        if player['x'] + player['width'] > obs['x'] and player['x'] < obs['x'] + obs['width'] and player['y'] + player['height'] >= HEIGHT - 30:
+            running = False  # ถ้าชนสิ่งกีดขวาง เกมจะจบ
+
+    # วาดตัวละคร (สี่เหลี่ยมสีแดง)
+    pygame.draw.rect(screen, RED, (player['x'], player['y'], player['width'], player['height']))
+
+    # แสดงคะแนนบนหน้าจอ
+    score_text = pygame.font.SysFont(None, 36).render(f"Score: {score}", True, (0, 0, 0))  # ข้อความคะแนน
+    screen.blit(score_text, (10, 10))  # แสดงคะแนนที่มุมซ้ายบน
+
+    pygame.display.update()  # อัปเดตหน้าจอ
+    clock.tick(30)  # จำกัดความเร็วของเกม (30 FPS)
+
+pygame.quit()  # ปิดเกม
+
