@@ -1,29 +1,57 @@
-import pygame, random
+import pygame, random  # นำเข้าไลบรารี pygame และ random สำหรับสร้างเกมและการสุ่มค่า
 
+# เริ่มต้น Pygame
 pygame.init()
-WIDTH, HEIGHT = 800, 600
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-fruit = {'x': random.randint(0, WIDTH-50), 'y': -50, 'speed': random.randint(3, 7)}
-score, clock = 0, pygame.time.Clock()
 
-running = True
+# กำหนดขนาดหน้าจอ
+WIDTH, HEIGHT = 800, 600  # กำหนดความกว้างและความสูงของหน้าจอ
+screen = pygame.display.set_mode((WIDTH, HEIGHT))  # สร้างหน้าจอแสดงผล
+
+# กำหนดข้อมูลของผลไม้
+fruit = {
+    'x': random.randint(0, WIDTH - 50),  # ตำแหน่งแกน x แบบสุ่มในช่วง 0 ถึง WIDTH - 50
+    'y': -50,  # เริ่มต้นที่ตำแหน่งนอกจอ (ด้านบน)
+    'speed': random.randint(3, 7)  # กำหนดความเร็วแบบสุ่มของผลไม้
+}
+
+# ตัวแปรเก็บคะแนน และตัวจับเวลา
+score = 0  # คะแนนเริ่มต้นที่ 0
+clock = pygame.time.Clock()  # ตัวจับเวลาสำหรับควบคุมความเร็วของเกม (FPS)
+
+# ตัวแปรควบคุมการทำงานของเกม
+running = True  # ตัวแปรสถานะเกม (ถ้าเป็น False เกมจะจบ)
+
+# วนลูปหลักของเกม
 while running:
-    screen.fill((255, 255, 255))
+    screen.fill((255, 255, 255))  # กำหนดพื้นหลังสีขาว
+
+    # ตรวจสอบเหตุการณ์ต่างๆ เช่น การคลิกเมาส์ หรือการปิดหน้าต่าง
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: running = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            x, y = event.pos
-            if fruit['x'] <= x <= fruit['x']+50 and fruit['y'] <= y <= fruit['y']+50:
-                score += 1
-                fruit = {'x': random.randint(0, WIDTH-50), 'y': -50, 'speed': random.randint(3, 7)}
+        if event.type == pygame.QUIT:  # ถ้าผู้ใช้กดปุ่มปิดหน้าต่าง
+            running = False  # หยุดลูป (จบเกม)
+        
+        if event.type == pygame.MOUSEBUTTONDOWN:  # ถ้าผู้ใช้คลิกปุ่มเมาส์
+            x, y = event.pos  # รับตำแหน่งของเมาส์
+            # ตรวจสอบว่าผู้ใช้คลิกที่ผลไม้หรือไม่
+            if fruit['x'] <= x <= fruit['x'] + 50 and fruit['y'] <= y <= fruit['y'] + 50:
+                score += 1  # เพิ่มคะแนน 1
+                # สร้างผลไม้ใหม่ที่ตำแหน่งใหม่
+                fruit = {'x': random.randint(0, WIDTH - 50), 'y': -50, 'speed': random.randint(3, 7)}
 
-    fruit['y'] += fruit['speed']
-    if fruit['y'] > HEIGHT: fruit = {'x': random.randint(0, WIDTH-50), 'y': -50, 'speed': random.randint(3, 7)}
+    # อัปเดตการเคลื่อนที่ของผลไม้
+    fruit['y'] += fruit['speed']  # เพิ่มค่าตำแหน่ง y ตามความเร็ว
+    if fruit['y'] > HEIGHT:  # ถ้าผลไม้ตกลงไปถึงล่างจอ
+        fruit = {'x': random.randint(0, WIDTH - 50), 'y': -50, 'speed': random.randint(3, 7)}  # สร้างผลไม้ใหม่ที่ตำแหน่งใหม่
 
-    pygame.draw.rect(screen, (255, 0, 0), (fruit['x'], fruit['y'], 50, 50))
-    score_text = pygame.font.SysFont(None, 36).render(f"Score: {score}", True, (0, 0, 0))
-    screen.blit(score_text, (10, 10))
-    pygame.display.update()
-    clock.tick(30)
+    # วาดผลไม้เป็นสี่เหลี่ยมสีแดง
+    pygame.draw.rect(screen, (255, 0, 0), (fruit['x'], fruit['y'], 50, 50))  # วาดสี่เหลี่ยมขนาด 50x50
 
+    # แสดงคะแนนบนหน้าจอ
+    score_text = pygame.font.SysFont(None, 36).render(f"Score: {score}", True, (0, 0, 0))  # กำหนดข้อความคะแนน
+    screen.blit(score_text, (10, 10))  # แสดงคะแนนที่มุมซ้ายบนของหน้าจอ
+
+    pygame.display.update()  # อัปเดตหน้าจอเพื่อแสดงผลการเปลี่ยนแปลง
+    clock.tick(30)  # จำกัดความเร็วของเกมไว้ที่ 30 เฟรมต่อวินาที (FPS)
+
+# ปิด Pygame เมื่อเกมสิ้นสุด
 pygame.quit()
