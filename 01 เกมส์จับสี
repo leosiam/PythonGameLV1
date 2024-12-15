@@ -1,29 +1,19 @@
 import pygame, random
 
-# เริ่มต้น Pygame
 pygame.init()
 
-# ขนาดหน้าจอ
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("เกมจับสี")
-
-# สีที่ใช้ในเกม
 COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
-target_color = (255, 0, 0)  # สีเป้าหมาย (สีแดง)
-
-# ตัวจับเวลาและคะแนน
+target_color = (255, 0, 0)  
 clock = pygame.time.Clock()
 score = 0
-
-# กล่องสี่เหลี่ยมสุ่มสี
-boxes = [{'x': random.randint(0, WIDTH - 100), 'y': random.randint(0, HEIGHT - 100),
-          'color': random.choice(COLORS)} for _ in range(5)]
+boxes = [{'x': random.randint(0, WIDTH - 100), 'y': random.randint(0, HEIGHT - 100),'color': random.choice(COLORS)} for _ in range(5)]
 
 running = True
 while running:
-    screen.fill((255, 255, 255))  # พื้นหลังสีขาว
-
+    screen.fill((255, 255, 255))  
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -31,22 +21,19 @@ while running:
             x, y = event.pos
             for box in boxes:
                 if box['x'] <= x <= box['x'] + 100 and box['y'] <= y <= box['y'] + 100:
-                    if box['color'] == target_color:  # ถ้าสีตรงกับเป้าหมาย
+                    if box['color'] == target_color:  
                         score += 1
                     else:
-                        score -= 1  # ถ้าคลิกผิดสี คะแนนลดลง
-                    box['color'] = random.choice(COLORS)  # เปลี่ยนสีของกล่อง
+                        score -= 1  
+                    box['color'] = random.choice(COLORS)  
 
-    # วาดกล่อง
     for box in boxes:
         pygame.draw.rect(screen, box['color'], (box['x'], box['y'], 100, 100))
 
-    # แสดงคะแนน
     font = pygame.font.SysFont('comicsansms', 30)
     score_text = font.render(f"คะแนน: {score}", True, (0, 0, 0))
     screen.blit(score_text, (10, 10))
 
-    # ข้อความให้คลิกสีเป้าหมาย
     target_text = font.render(f"คลิกสีแดง!", True, (0, 0, 0))
     screen.blit(target_text, (WIDTH // 2 - 100, 10))
 
@@ -54,3 +41,56 @@ while running:
     clock.tick(30)
 
 pygame.quit()
+
+#=======================================================================================================================
+
+import pygame, random  # นำเข้าไลบรารี pygame และ random สำหรับการสุ่มค่า
+
+# เริ่มต้น Pygame
+pygame.init()
+
+# กำหนดขนาดหน้าจอและการตั้งค่าพื้นฐาน
+WIDTH, HEIGHT = 800, 600  # กำหนดความกว้างและความสูงของหน้าจอ
+screen = pygame.display.set_mode((WIDTH, HEIGHT))  # สร้างหน้าจอ
+pygame.display.set_caption("เกมจับสี")  # ตั้งชื่อหน้าจอ
+COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]  # สีที่ใช้ในเกม (แดง, เขียว, น้ำเงิน, เหลือง)
+target_color = (255, 0, 0)  # สีเป้าหมายที่ต้องคลิก (สีแดง)
+clock = pygame.time.Clock()  # ใช้สำหรับควบคุมความเร็วของเกม
+score = 0  # คะแนนเริ่มต้น
+
+# สร้างกล่องสี 5 กล่องในตำแหน่งแบบสุ่ม
+boxes = [{'x': random.randint(0, WIDTH - 100), 'y': random.randint(0, HEIGHT - 100), 'color': random.choice(COLORS)} for _ in range(5)]
+
+# เริ่มลูปเกม
+running = True
+while running:
+    screen.fill((255, 255, 255))  # ล้างหน้าจอด้วยสีขาว
+
+    for event in pygame.event.get():  # วนลูปตรวจจับเหตุการณ์ (เช่น คลิกเมาส์หรือปิดหน้าจอ)
+        if event.type == pygame.QUIT:  # ถ้ามีการกดปุ่มปิดหน้าจอ
+            running = False  # สิ้นสุดเกม
+        if event.type == pygame.MOUSEBUTTONDOWN:  # ถ้าผู้เล่นคลิกเมาส์
+            x, y = event.pos  # เก็บตำแหน่งของการคลิกเมาส์
+            for box in boxes:  # ตรวจสอบกล่องทุกกล่อง
+                if box['x'] <= x <= box['x'] + 100 and box['y'] <= y <= box['y'] + 100:  # ตรวจสอบว่าคลิกในกล่องหรือไม่
+                    if box['color'] == target_color:  # ถ้าสีของกล่องตรงกับสีเป้าหมาย (สีแดง)
+                        score += 1  # เพิ่มคะแนน
+                    else:
+                        score -= 1  # ถ้าคลิกสีผิด จะลดคะแนน
+                    box['color'] = random.choice(COLORS)  # เปลี่ยนสีของกล่องที่ถูกคลิก
+
+    for box in boxes:  # วาดกล่องทั้งหมดบนหน้าจอ
+        pygame.draw.rect(screen, box['color'], (box['x'], box['y'], 100, 100))  # วาดกล่องด้วยสีและตำแหน่งที่กำหนด
+
+    font = pygame.font.SysFont('comicsansms', 30)  # กำหนดฟอนต์สำหรับข้อความ
+    score_text = font.render(f"คะแนน: {score}", True, (0, 0, 0))  # แสดงคะแนน
+    screen.blit(score_text, (10, 10))  # วางคะแนนที่มุมบนซ้าย
+
+    target_text = font.render(f"คลิกสีแดง!", True, (0, 0, 0))  # ข้อความเป้าหมายให้ผู้เล่นคลิกสีแดง
+    screen.blit(target_text, (WIDTH // 2 - 100, 10))  # วางข้อความไว้ตรงกลางหน้าจอ
+
+    pygame.display.update()  # อัปเดตหน้าจอ
+    clock.tick(30)  # กำหนดเฟรมเรต 30 FPS (ภาพต่อวินาที)
+
+pygame.quit()  # ปิดเกมเมื่อออกจากลูป
+
