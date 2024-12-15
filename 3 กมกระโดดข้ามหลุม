@@ -1,0 +1,79 @@
+import pygame, random  # นำเข้าไลบรารี pygame และ random
+
+pygame.init()  # เริ่มต้น Pygame
+
+# ขนาดหน้าจอ
+WIDTH, HEIGHT = 800, 400
+screen = pygame.display.set_mode((WIDTH, HEIGHT))  # กำหนดขนาดหน้าจอ
+pygame.display.set_caption("เกมกระโดดข้ามหลุม")  # ชื่อของเกม
+
+# สี
+WHITE = (255, 255, 255)  # สีพื้นหลัง (สีขาว)
+BLACK = (0, 0, 0)  # สีของหลุม (สีดำ)
+RED = (255, 0, 0)  # สีของตัวละคร (สีแดง)
+
+# ตัวจับเวลา
+clock = pygame.time.Clock()  # ใช้สำหรับควบคุมเฟรมเรต
+
+# ตัวละคร (Player)
+player = {
+    'x': 50,  # ตำแหน่งแกน x ของตัวละคร
+    'y': HEIGHT - 60,  # ตำแหน่งแกน y (เริ่มต้นที่พื้น)
+    'width': 50,  # ความกว้างของตัวละคร
+    'height': 50,  # ความสูงของตัวละคร
+    'velocity': 0,  # ความเร็วในแนวตั้ง
+    'is_jumping': False  # ตัวแปรเพื่อตรวจสอบว่าตัวละครกำลังกระโดดหรือไม่
+}
+
+# หลุม (Obstacle)
+holes = [{'x': random.randint(400, 800), 'width': random.randint(50, 100)} for _ in range(3)]  # สร้างหลุมแบบสุ่ม 3 หลุม
+
+# ตัวแปรสถานะของเกม
+running = True
+score = 0  # คะแนนเริ่มต้นที่ 0
+
+while running:
+    screen.fill(WHITE)  # ตั้งค่าพื้นหลังสีขาว
+
+    # ตรวจจับเหตุการณ์ (Event)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:  # ถ้าผู้ใช้กดปุ่มปิดหน้าต่าง
+            running = False  # หยุดการทำงานของเกม
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not player['is_jumping']:  # กดปุ่ม SPACE เพื่อกระโดด
+            player['is_jumping'] = True  # กำหนดให้ตัวละครกระโดด
+            player['velocity'] = -12  # ความเร็วของการกระโดด (ค่าติดลบเพราะกระโดดขึ้น)
+
+    # อัปเดตการกระโดดของตัวละคร
+    player['y'] += player['velocity']  # อัปเดตตำแหน่ง y ของตัวละคร
+    if player['is_jumping']: 
+        player['velocity'] += 1  # เพิ่มความเร็วในแนวตั้ง (เลียนแบบแรงโน้มถ่วง)
+    if player['y'] >= HEIGHT - player['height']:  # ถ้าตัวละครถึงพื้นแล้ว
+        player['y'] = HEIGHT - player['height']  # ปรับตำแหน่งตัวละครให้ติดพื้น
+        player['is_jumping'] = False  # สิ้นสุดการกระโดด
+
+    # อัปเดตตำแหน่งของหลุม
+    for hole in holes:
+        hole['x'] -= 5  # หลุมเคลื่อนที่ไปทางซ้าย
+        if hole['x'] < -hole['width']:  # ถ้าหลุมออกนอกหน้าจอ
+            hole['x'] = WIDTH + random.randint(100, 300)  # สุ่มตำแหน่งหลุมใหม่ที่นอกหน้าจอ
+            hole['width'] = random.randint(50, 100)  # สุ่มความกว้างของหลุมใหม่
+            score += 1  # เพิ่มคะแนนเมื่อผ่านหลุมได้สำเร็จ
+
+    # ตรวจสอบว่าตัวละครตกลงไปในหลุมหรือไม่
+    for hole in holes:
+        pygame.draw.rect(screen, BLACK, (hole['x'], HEIGHT - 10, hole['width'], 10))  # วาดหลุม
+        # ตรวจสอบการชนระหว่างตัวละครและหลุม
+        if player['x'] + player['width'] > hole['x'] and player['x'] < hole['x'] + hole['width'] and player['y'] + player['height'] >= HEIGHT - 10:
+            running = False  # ถ้าตกหลุม จบเกม
+
+    # วาดตัวละคร
+    pygame.draw.rect(screen, RED, (player['x'], player['y'], player['width'], player['height']))
+
+    # แสดงคะแนนบนหน้าจอ
+    score_text = pygame.font.SysFont(None, 36).render(f"Score: {score}", True, (0, 0, 0))  # ข้อความคะแนน
+    screen.blit(score_text, (10, 10))  # วางคะแนนไว้ที่มุมซ้ายบน
+
+    pygame.display.update()  # อัปเดตหน้าจอ
+    clock.tick(30)  # จำกัดความเร็วของเฟรม (30 FPS)
+
+pygame.quit()  # ปิดเกม
