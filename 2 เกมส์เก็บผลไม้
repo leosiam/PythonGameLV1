@@ -1,0 +1,29 @@
+import pygame, random
+
+pygame.init()
+WIDTH, HEIGHT = 800, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+fruit = {'x': random.randint(0, WIDTH-50), 'y': -50, 'speed': random.randint(3, 7)}
+score, clock = 0, pygame.time.Clock()
+
+running = True
+while running:
+    screen.fill((255, 255, 255))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT: running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            x, y = event.pos
+            if fruit['x'] <= x <= fruit['x']+50 and fruit['y'] <= y <= fruit['y']+50:
+                score += 1
+                fruit = {'x': random.randint(0, WIDTH-50), 'y': -50, 'speed': random.randint(3, 7)}
+
+    fruit['y'] += fruit['speed']
+    if fruit['y'] > HEIGHT: fruit = {'x': random.randint(0, WIDTH-50), 'y': -50, 'speed': random.randint(3, 7)}
+
+    pygame.draw.rect(screen, (255, 0, 0), (fruit['x'], fruit['y'], 50, 50))
+    score_text = pygame.font.SysFont(None, 36).render(f"Score: {score}", True, (0, 0, 0))
+    screen.blit(score_text, (10, 10))
+    pygame.display.update()
+    clock.tick(30)
+
+pygame.quit()
