@@ -1,0 +1,56 @@
+import pygame, random
+
+# เริ่มต้น Pygame
+pygame.init()
+
+# ขนาดหน้าจอ
+WIDTH, HEIGHT = 800, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("เกมจับสี")
+
+# สีที่ใช้ในเกม
+COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
+target_color = (255, 0, 0)  # สีเป้าหมาย (สีแดง)
+
+# ตัวจับเวลาและคะแนน
+clock = pygame.time.Clock()
+score = 0
+
+# กล่องสี่เหลี่ยมสุ่มสี
+boxes = [{'x': random.randint(0, WIDTH - 100), 'y': random.randint(0, HEIGHT - 100),
+          'color': random.choice(COLORS)} for _ in range(5)]
+
+running = True
+while running:
+    screen.fill((255, 255, 255))  # พื้นหลังสีขาว
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            x, y = event.pos
+            for box in boxes:
+                if box['x'] <= x <= box['x'] + 100 and box['y'] <= y <= box['y'] + 100:
+                    if box['color'] == target_color:  # ถ้าสีตรงกับเป้าหมาย
+                        score += 1
+                    else:
+                        score -= 1  # ถ้าคลิกผิดสี คะแนนลดลง
+                    box['color'] = random.choice(COLORS)  # เปลี่ยนสีของกล่อง
+
+    # วาดกล่อง
+    for box in boxes:
+        pygame.draw.rect(screen, box['color'], (box['x'], box['y'], 100, 100))
+
+    # แสดงคะแนน
+    font = pygame.font.SysFont('comicsansms', 30)
+    score_text = font.render(f"คะแนน: {score}", True, (0, 0, 0))
+    screen.blit(score_text, (10, 10))
+
+    # ข้อความให้คลิกสีเป้าหมาย
+    target_text = font.render(f"คลิกสีแดง!", True, (0, 0, 0))
+    screen.blit(target_text, (WIDTH // 2 - 100, 10))
+
+    pygame.display.update()
+    clock.tick(30)
+
+pygame.quit()
