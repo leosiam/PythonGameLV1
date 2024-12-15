@@ -1,3 +1,67 @@
+import pygame, random
+
+pygame.init()
+WIDTH, HEIGHT = 800, 400
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("เกมกระโดดข้ามหลุม")
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+
+clock = pygame.time.Clock()
+
+player = {'x': 50, 'y': HEIGHT - 60, 'width': 50, 'height': 50, 'velocity': 0, 'is_jumping': False}
+
+holes = [{'x': random.randint(400, 800), 'width': random.randint(50, 100)} for _ in range(3)]
+
+running = True
+score = 0
+
+while running:
+    screen.fill(WHITE)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and not player['is_jumping']:
+            player['is_jumping'] = True
+            player['velocity'] = -12
+
+    player['y'] += player['velocity']
+    if player['is_jumping']: 
+        player['velocity'] += 1
+    if player['y'] >= HEIGHT - player['height']:
+        player['y'] = HEIGHT - player['height']
+        player['is_jumping'] = False
+
+    for hole in holes:
+        hole['x'] -= 5
+        if hole['x'] < -hole['width']:
+            hole['x'] = WIDTH + random.randint(100, 300)
+            hole['width'] = random.randint(50, 100)
+            score += 1
+
+    for hole in holes:
+        pygame.draw.rect(screen, BLACK, (hole['x'], HEIGHT - 10, hole['width'], 10))
+        if player['x'] + player['width'] > hole['x'] and player['x'] < hole['x'] + hole['width'] and player['y'] + player['height'] >= HEIGHT - 10:
+            running = False
+
+    pygame.draw.rect(screen, RED, (player['x'], player['y'], player['width'], player['height']))
+
+    score_text = pygame.font.SysFont(None, 36).render(f"Score: {score}", True, (0, 0, 0))
+    screen.blit(score_text, (10, 10))
+
+    pygame.display.update()
+    clock.tick(30)
+
+pygame.quit()
+
+
+#============================================================================================================================================
+#code+คำอธิบาย
+
+
 import pygame, random  # นำเข้าไลบรารี pygame และ random
 
 pygame.init()  # เริ่มต้น Pygame
