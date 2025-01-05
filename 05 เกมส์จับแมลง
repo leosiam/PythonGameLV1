@@ -1,0 +1,90 @@
+import pygame
+import random
+import sys
+
+# Initialize Pygame
+pygame.init()
+
+# Screen dimensions
+WIDTH, HEIGHT = 800, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("เกมจับแมลง")
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+
+# Clock and font
+clock = pygame.time.Clock()
+font = pygame.font.Font(None, 36)
+
+# Game variables
+bug_size = 40
+bug_pos = [random.randint(0, WIDTH - bug_size), random.randint(0, HEIGHT - bug_size)]
+bug_speed = [random.choice([-3, 3]), random.choice([-3, 3])]
+score = 0
+lives = 3
+
+# Load bug image
+bug_image = pygame.image.load("bug.png")
+bug_image = pygame.transform.scale(bug_image, (bug_size, bug_size))
+
+# Function to draw the score and lives
+def draw_hud():
+    score_text = font.render(f"คะแนน: {score}", True, BLACK)
+    lives_text = font.render(f"ชีวิต: {lives}", True, BLACK)
+    screen.blit(score_text, (10, 10))
+    screen.blit(lives_text, (10, 50))
+
+# Game loop
+running = True
+while running:
+    screen.fill(WHITE)
+    
+    # Update bug position
+    bug_pos[0] += bug_speed[0]
+    bug_pos[1] += bug_speed[1]
+
+    # Bounce bug off walls
+    if bug_pos[0] <= 0 or bug_pos[0] >= WIDTH - bug_size:
+        bug_speed[0] *= -1
+    if bug_pos[1] <= 0 or bug_pos[1] >= HEIGHT - bug_size:
+        bug_speed[1] *= -1
+
+    # Draw bug
+    screen.blit(bug_image, (bug_pos[0], bug_pos[1]))
+
+    # Draw score and lives
+    draw_hud()
+    pygame.display.flip()
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        # Check for mouse click
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+            if (bug_pos[0] <= mouse_pos[0] <= bug_pos[0] + bug_size and
+                bug_pos[1] <= mouse_pos[1] <= bug_pos[1] + bug_size):
+                score += 1
+                bug_pos = [random.randint(0, WIDTH - bug_size), random.randint(0, HEIGHT - bug_size)]
+                bug_speed = [random.choice([-3, 3]), random.choice([-3, 3])]
+
+    # Check if bug escapes screen
+    if (bug_pos[0] < -bug_size or bug_pos[0] > WIDTH + bug_size or
+        bug_pos[1] < -bug_size or bug_pos[1] > HEIGHT + bug_size):
+        lives -= 1
+        bug_pos = [random.randint(0, WIDTH - bug_size), random.randint(0, HEIGHT - bug_size)]
+        bug_speed = [random.choice([-3, 3]), random.choice([-3, 3])]
+
+    # End game if lives reach 0
+    if lives <= 0:
+        print(f"จบเกม! คะแนนของคุณคือ: {score}")
+        running = False
+
+    clock.tick(60)
+
+pygame.quit()
+sys.exit()
